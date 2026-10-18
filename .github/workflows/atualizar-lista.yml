@@ -41,6 +41,9 @@ jobs:
 
             let m3uContent = '#EXTM3U\n\n';
 
+            // Função para limpar nomes e comparar palavras-chave
+            const clean = str => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
             for (const rel of releases.data) {
               const category = rel.name || rel.tag_name;
 
@@ -50,18 +53,22 @@ jobs:
                   const baseName = path.basename(asset.name, ext);
                   const titleFormatted = baseName.replace(/\./g, ' ');
 
-                  // Correspondência de capa: por nome exato do arquivo, início do nome ou nome da pasta
+                  const cleanBase = clean(baseName);
+                  const cleanCat = clean(category);
+
+                  // Busca flexível de capa:
                   const matchedCapa = capaFiles.find(file => {
-                    const cBase = path.basename(file, path.extname(file)).toLowerCase();
-                    const bLower = baseName.toLowerCase();
-                    const catLower = category.toLowerCase();
-                    return cBase === bLower || bLower.startsWith(cBase) || catLower.startsWith(cBase);
+                    const cBase = clean(path.basename(file, path.extname(file)));
+                    if (!cBase) return false;
+                    return cleanBase.includes(cBase) || 
+                           cBase.includes(cleanBase) || 
+                           cleanCat.includes(cBase) || 
+                           cBase.includes(cleanCat);
                   });
 
                   let logoAttr = '';
                   if (matchedCapa) {
                     const encodedCapa = encodeURIComponent(matchedCapa);
-                    // Usando CDN direta jsDelivr para carregar sem restrição no ClouDDy
                     const logoUrl = `https://cdn.jsdelivr.net/gh/${context.repo.owner}/${context.repo.repo}@main/capas/${encodedCapa}`;
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
@@ -78,5 +85,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: lista.m3u gerada com CDN de capas para ClouDDy"
+          commit_message: "Auto: lista.m3u atualizada com busca flexivel de capas"
           file_pattern: 'lista.m3u'
