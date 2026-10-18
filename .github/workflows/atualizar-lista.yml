@@ -27,25 +27,21 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // 1. Ler todas as imagens na pasta capas/
             const capasDir = path.join(process.cwd(), 'capas');
             let capaFiles = [];
             if (fs.existsSync(capasDir)) {
               capaFiles = fs.readdirSync(capasDir);
             }
 
-            // 2. Buscar todas as releases do repositório
             const releases = await github.rest.repos.listReleases({
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100
             });
 
-            // Inicia sempre com o cabeçalho obrigatório
             let m3uContent = '#EXTM3U\n\n';
 
             for (const rel of releases.data) {
-              // Categoria baseada no Título da Release (ex: Digimon - Temporada 1 ou Filmes - Ação)
               const category = rel.name || rel.tag_name;
 
               for (const asset of rel.assets) {
@@ -54,10 +50,7 @@ jobs:
                   const baseName = path.basename(asset.name, ext);
                   const titleFormatted = baseName.replace(/\./g, ' ');
 
-                  // Tenta achar a capa:
-                  // 1º: Nome exato do vídeo (ex: Digimon.S01E11.jpg)
-                  // 2º: Nome da série/base (ex: Digimon.jpg)
-                  // 3º: Nome da categoria (ex: Digimon - Temporada 1.jpg)
+                  // Correspondência de capa: por nome exato do arquivo, início do nome ou nome da pasta
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = path.basename(file, path.extname(file)).toLowerCase();
                     const bLower = baseName.toLowerCase();
@@ -68,11 +61,11 @@ jobs:
                   let logoAttr = '';
                   if (matchedCapa) {
                     const encodedCapa = encodeURIComponent(matchedCapa);
-                    const logoUrl = `https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/main/capas/${encodedCapa}`;
+                    // Usando CDN direta jsDelivr para carregar sem restrição no ClouDDy
+                    const logoUrl = `https://cdn.jsdelivr.net/gh/${context.repo.owner}/${context.repo.repo}@main/capas/${encodedCapa}`;
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  // Linha compatível com ClouDDy e todos os apps de Smart TV
                   m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${category}",${titleFormatted}\n`;
                   m3uContent += `${asset.browser_download_url}\n\n`;
                 }
@@ -85,5 +78,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: lista.m3u atualizada com capas e categorias para ClouDDy"
+          commit_message: "Auto: lista.m3u gerada com CDN de capas para ClouDDy"
           file_pattern: 'lista.m3u'
