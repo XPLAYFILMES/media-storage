@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Gerar lista M3U com capas e categorias
         uses: actions/github-script@v7
@@ -25,14 +27,12 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // 1. Mapear as capas existentes na pasta capas/
             const capasDir = path.join(process.cwd(), 'capas');
             let capaFiles = [];
             if (fs.existsSync(capasDir)) {
               capaFiles = fs.readdirSync(capasDir);
             }
 
-            // 2. Procurar todas as Releases
             const releases = await github.rest.repos.listReleases({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -42,7 +42,6 @@ jobs:
             let m3uContent = '#EXTM3U\n\n';
 
             for (const rel of releases.data) {
-              // Categoria baseada no Título da Release
               const groupName = rel.name || rel.tag_name;
 
               for (const asset of rel.assets) {
@@ -51,7 +50,6 @@ jobs:
                   const baseName = path.basename(asset.name, ext);
                   const titleFormatted = baseName.replace(/\./g, ' ');
 
-                  // 3. Verificar se existe uma capa com o mesmo nome na pasta capas/
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = path.basename(file, path.extname(file));
                     return cBase.toLowerCase() === baseName.toLowerCase();
@@ -64,7 +62,6 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  // 4. Montar a linha formatada
                   m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${groupName}",${titleFormatted}\n`;
                   m3uContent += `${asset.browser_download_url}\n\n`;
                 }
@@ -73,9 +70,14 @@ jobs:
 
             fs.writeFileSync('lista.m3u', m3uContent);
 
-      - name: Gravar alterações no repositório
+      - name: Gravar alteracoes no repositorio
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add lista.m3u
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto: lista.m3u atualizada com capas e categorias" && git push)
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteração detetada."
+          else
+            git commit -m "Auto: lista.m3u atualizada"
+            git push origin main
+          fi
