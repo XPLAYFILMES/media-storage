@@ -3,6 +3,6 @@
 #EXTINF:-1 group-title="v1.0",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO
 https://github.com/XPLAYFILMES/media-storage/releases/download/v1.0/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4
 
-#EXTINF:-1 group-title="Temporada 1",18
-https://github.com/XPLAYFILMES/media-storage/releases/download/Digimom/18.mp4
+#EXTINF:-1 series-id="digimon" season="1" episode="11" group-title="Digimon",Digimon S01E11
+https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E11.mp4
 
