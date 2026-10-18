@@ -15,9 +15,10 @@ jobs:
   build-m3u:
     runs-on: ubuntu-latest
     steps:
-      - name: Baixar o repositório
+      - name: Obter o repositório
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Gerar lista M3U com capas e categorias
@@ -70,14 +71,15 @@ jobs:
 
             fs.writeFileSync('lista.m3u', m3uContent);
 
-      - name: Gravar alteracoes no repositorio
+      - name: Gravar alterações no repositório
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add lista.m3u
           if git diff --staged --quiet; then
-            echo "Nenhuma alteração detetada."
+            echo "Nenhuma alteração na lista."
           else
             git commit -m "Auto: lista.m3u atualizada"
+            git pull --rebase origin main
             git push origin main
           fi
