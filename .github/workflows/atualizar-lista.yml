@@ -17,62 +17,52 @@ jobs:
     steps:
       - name: Obter repositório
         uses: actions/checkout@v4
+        with:
+          ref: main
 
-      - name: Gerar lista M3U inteligente para Séries e Filmes
+      - name: Gerar lista M3U com capas e categorias
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
 
+            // 1. Ler todas as imagens na pasta capas/
             const capasDir = path.join(process.cwd(), 'capas');
             let capaFiles = [];
             if (fs.existsSync(capasDir)) {
               capaFiles = fs.readdirSync(capasDir);
             }
 
+            // 2. Buscar todas as releases do repositório
             const releases = await github.rest.repos.listReleases({
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100
             });
 
+            // Inicia sempre com o cabeçalho obrigatório
             let m3uContent = '#EXTM3U\n\n';
 
             for (const rel of releases.data) {
-              const releaseTitle = rel.name || rel.tag_name;
+              // Categoria baseada no Título da Release (ex: Digimon - Temporada 1 ou Filmes - Ação)
+              const category = rel.name || rel.tag_name;
 
               for (const asset of rel.assets) {
                 const ext = path.extname(asset.name).toLowerCase();
                 if (ext === '.mp4' || ext === '.mkv') {
                   const baseName = path.basename(asset.name, ext);
-                  
-                  // Detecta se é Série pelo padrão S01E01 ou S1E1
-                  const seriesMatch = baseName.match(/^(.*?)[._ -]+[Ss](\d{1,2})[Ee](\d{1,2})(?:[._ -]+(.*))?$/i);
+                  const titleFormatted = baseName.replace(/\./g, ' ');
 
-                  let groupTitle = releaseTitle;
-                  let itemTitle = baseName.replace(/\./g, ' ');
-                  let extraTags = '';
-                  let capaSearchName = baseName;
-
-                  if (seriesMatch) {
-                    const seriesName = seriesMatch[1].replace(/\./g, ' ').trim();
-                    const seasonNum = parseInt(seriesMatch[2], 10);
-                    const epNum = parseInt(seriesMatch[3], 10);
-                    const epExtraTitle = seriesMatch[4] ? ' - ' + seriesMatch[4].replace(/\./g, ' ').trim() : '';
-
-                    groupTitle = seriesName; // Na TV agrupa dentro de "Digimon"
-                    itemTitle = `${seriesName} S${String(seasonNum).padStart(2, '0')}E${String(epNum).padStart(2, '0')}${epExtraTitle}`;
-                    extraTags = `series-id="${seriesName.toLowerCase().replace(/\s+/g, '-')}" season="${seasonNum}" episode="${epNum}" `;
-                    
-                    // Permite usar a capa da série inteira (ex: Digimon.jpg) ou a capa do episódio
-                    capaSearchName = seriesName;
-                  }
-
-                  // Busca capa específica ou capa geral da série
+                  // Tenta achar a capa:
+                  // 1º: Nome exato do vídeo (ex: Digimon.S01E11.jpg)
+                  // 2º: Nome da série/base (ex: Digimon.jpg)
+                  // 3º: Nome da categoria (ex: Digimon - Temporada 1.jpg)
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = path.basename(file, path.extname(file)).toLowerCase();
-                    return cBase === baseName.toLowerCase() || cBase === capaSearchName.toLowerCase();
+                    const bLower = baseName.toLowerCase();
+                    const catLower = category.toLowerCase();
+                    return cBase === bLower || bLower.startsWith(cBase) || catLower.startsWith(cBase);
                   });
 
                   let logoAttr = '';
@@ -82,7 +72,8 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  m3uContent += `#EXTINF:-1 ${logoAttr}${extraTags}group-title="${groupTitle}",${itemTitle}\n`;
+                  // Linha compatível com ClouDDy e todos os apps de Smart TV
+                  m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${category}",${titleFormatted}\n`;
                   m3uContent += `${asset.browser_download_url}\n\n`;
                 }
               }
@@ -93,5 +84,6 @@ jobs:
       - name: Gravar lista.m3u automaticamente
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto: lista.m3u estruturada para séries e filmes"
+          branch: main
+          commit_message: "Auto: lista.m3u atualizada com capas e categorias para ClouDDy"
           file_pattern: 'lista.m3u'
