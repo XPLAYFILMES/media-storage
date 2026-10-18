@@ -15,16 +15,12 @@ jobs:
   build-m3u:
     runs-on: ubuntu-latest
     steps:
-      - name: Obter o repositório
+      - name: Obter repositório
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}
 
       - name: Gerar lista M3U com capas e categorias
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_PAT }}
           script: |
             const fs = require('fs');
             const path = require('path');
@@ -72,14 +68,8 @@ jobs:
 
             fs.writeFileSync('lista.m3u', m3uContent);
 
-      - name: Gravar alterações no repositório
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add lista.m3u
-          if git diff --staged --quiet; then
-            echo "Nenhuma alteração na lista."
-          else
-            git commit -m "Auto: lista.m3u atualizada"
-            git push origin main
-          fi
+      - name: Gravar lista.m3u automaticamente
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto: lista.m3u atualizada"
+          file_pattern: 'lista.m3u'
