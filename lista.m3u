@@ -6,15 +6,15 @@ https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/Sam
 #EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E02
 https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/Sam.Sapeca.S01E02.mp4
 
+#EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",videoplayback 2
+https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/videoplayback.2.mp4
+
 #EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E11
 https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E11.mp4
 
 #EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E12
 https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E12.mp4
 
-#EXTINF:-1 group-title="Filmes - Ação",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO (Ação)
-https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4?cat=1
-
-#EXTINF:-1 group-title="Filmes - Comédia",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO (Comédia)
-https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4?cat=2
+#EXTINF:-1 group-title="Filmes - Ação / Filmes - Comédia",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO
+https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4
 
