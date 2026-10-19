@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
 
-      - name: Gerar lista M3U com separacao estrita de categorias
+      - name: Gerar lista M3U sem conflito de duplicidade
         uses: actions/github-script@v7
         with:
           script: |
@@ -45,6 +45,7 @@ jobs:
             for (const rel of releases.data) {
               const rawTitle = rel.name || rel.tag_name;
 
+              // Divide as categorias por "/" ou ";"
               let categories = [];
               if (rawTitle.includes('/')) {
                 categories = rawTitle.split('/').map(c => c.trim()).filter(Boolean);
@@ -63,6 +64,7 @@ jobs:
                   const cleanBase = clean(baseName);
                   const cleanRaw = clean(rawTitle);
 
+                  // Localização flexível de capa
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = clean(path.basename(file, path.extname(file)));
                     if (!cBase) return false;
@@ -79,15 +81,21 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
+                  // Cria entrada única para cada categoria evitando descarte do ClouDDy
                   categories.forEach((cat, index) => {
                     const separator = asset.browser_download_url.includes('?') ? '&' : '?';
                     const streamUrl = categories.length > 1 
-                      ? `${asset.browser_download_url}${separator}cat=${index + 1}`
+                      ? `${asset.browser_download_url}${separator}cat=${encodeURIComponent(cat)}`
                       : asset.browser_download_url;
 
-                    const uniqueId = `${cleanBase}_cat${index + 1}`;
+                    const uniqueId = `${cleanBase}_${index + 1}`;
+                    // Se estiver em multiplas categorias, diferencia o nome com espaço invisivel + etiqueta
+                    const displayName = categories.length > 1 
+                      ? `${titleFormatted} • ${cat}`
+                      : titleFormatted;
 
-                    m3uContent += `#EXTINF:-1 tvg-id="${uniqueId}" ${logoAttr}group-title="${cat}",${titleFormatted}\n`;
+                    m3uContent += `#EXTINF:-1 tvg-id="${uniqueId}" ${logoAttr}group-title="${cat}",${displayName}\n`;
+                    m3uContent += `#EXTGRP:${cat}\n`;
                     m3uContent += `${streamUrl}\n\n`;
                   });
                 }
@@ -100,5 +108,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: tvg-id unico e link diferenciado por categoria"
+          commit_message: "Auto: titulos e tags blindados contra deduplicacao no ClouDDy"
           file_pattern: 'lista.m3u'
