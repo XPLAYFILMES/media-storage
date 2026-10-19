@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
 
-      - name: Gerar lista M3U com titulos separados por categoria
+      - name: Gerar lista M3U com grupos unificados
         uses: actions/github-script@v7
         with:
           script: |
@@ -45,6 +45,7 @@ jobs:
             for (const rel of releases.data) {
               const rawTitle = rel.name || rel.tag_name;
 
+              // Divide as categorias se houver "/" ou ";"
               let categories = [];
               if (rawTitle.includes('/')) {
                 categories = rawTitle.split('/').map(c => c.trim()).filter(Boolean);
@@ -53,6 +54,8 @@ jobs:
               } else {
                 categories = [rawTitle.trim()];
               }
+
+              const combinedGroups = categories.join(';');
 
               for (const asset of rel.assets) {
                 const ext = path.extname(asset.name).toLowerCase();
@@ -63,7 +66,6 @@ jobs:
                   const cleanBase = clean(baseName);
                   const cleanRaw = clean(rawTitle);
 
-                  // Localização flexível de capa
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = clean(path.basename(file, path.extname(file)));
                     if (!cBase) return false;
@@ -80,22 +82,9 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  // Cria entrada com identificador e nome unico por categoria
-                  categories.forEach((cat, index) => {
-                    const separator = asset.browser_download_url.includes('?') ? '&' : '?';
-                    const streamUrl = categories.length > 1 
-                      ? `${asset.browser_download_url}${separator}cat=${index + 1}`
-                      : asset.browser_download_url;
-
-                    // Se tiver mais de uma categoria, adiciona o rotulo no titulo para o ClouDDy nao descartar
-                    const cleanCatName = cat.replace(/^Filmes\s*-\s*/i, '').trim();
-                    const finalTitle = categories.length > 1 
-                      ? `${titleFormatted} (${cleanCatName})`
-                      : titleFormatted;
-
-                    m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${cat}",${finalTitle}\n`;
-                    m3uContent += `${streamUrl}\n\n`;
-                  });
+                  // Linha unica: sem sufixo no titulo e com grupos separados por ponto e virgula
+                  m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${combinedGroups}",${titleFormatted}\n`;
+                  m3uContent += `${asset.browser_download_url}\n\n`;
                 }
               }
             }
@@ -106,5 +95,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: titulos distintos para suportar multiplas categorias no ClouDDy"
+          commit_message: "Auto: entrada unica por video com multiplos grupos unificados"
           file_pattern: 'lista.m3u'
