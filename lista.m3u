@@ -1,20 +1,18 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-name="Sam Sapeca S01E01 [Series-Sam Sapeca]" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E01
+#EXTINF:-1 tvg-id="samsapecas01e01" tvg-name="Sam Sapeca S01E01" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E01
 https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/Sam.Sapeca.S01E01.mp4
 
-#EXTINF:-1 tvg-name="Sam Sapeca S01E02 [Series-Sam Sapeca]" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E02
+#EXTINF:-1 tvg-id="samsapecas01e02" tvg-name="Sam Sapeca S01E02" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E02
 https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/Sam.Sapeca.S01E02.mp4
 
-#EXTINF:-1 tvg-name="Digimon S01E11 [Series-Digimon]" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E11
+#EXTINF:-1 tvg-id="digimons01e11" tvg-name="Digimon S01E11" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E11
 https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E11.mp4
 
-#EXTINF:-1 tvg-name="Digimon S01E12 [Series-Digimon]" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E12
+#EXTINF:-1 tvg-id="digimons01e12" tvg-name="Digimon S01E12" tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E12
 https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E12.mp4
 
-#EXTINF:-1 tvg-name="ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO [Filmes - Ação]" group-title="Filmes - Ação",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO
-https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4?cat=1
-
-#EXTINF:-1 tvg-name="ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO [Filmes - Comédia]" group-title="Filmes - Comédia",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO​
-https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4?cat=2
+#EXTINF:-1 tvg-id="arthurencontrouumursodentrodoacampamento" tvg-name="ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO" group-title="Filmes - Ação",ARTHUR ENCONTROU UM URSO DENTRO DO ACAMPAMENTO
+#EXTGRP:Filmes - Ação;Filmes - Comédia
+https://github.com/XPLAYFILMES/media-storage/releases/download/Filmes/ARTHUR.ENCONTROU.UM.URSO.DENTRO.DO.ACAMPAMENTO.mp4
 
