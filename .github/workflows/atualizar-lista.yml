@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
 
-      - name: Gerar lista M3U com capas e categorias
+      - name: Gerar lista M3U com suporte a multiplas categorias
         uses: actions/github-script@v7
         with:
           script: |
@@ -41,11 +41,15 @@ jobs:
 
             let m3uContent = '#EXTM3U\n\n';
 
-            // Função para limpar nomes e comparar palavras-chave
             const clean = str => str.toLowerCase().replace(/[^a-z0-9]/g, '');
 
             for (const rel of releases.data) {
-              const category = rel.name || rel.tag_name;
+              const rawTitle = rel.name || rel.tag_name;
+
+              // Divide as categorias se houver "/" ou ";" no título
+              const categories = rawTitle.includes('/') 
+                ? rawTitle.split('/').map(c => c.trim()).filter(Boolean)
+                : rawTitle.split(';').map(c => c.trim()).filter(Boolean);
 
               for (const asset of rel.assets) {
                 const ext = path.extname(asset.name).toLowerCase();
@@ -54,16 +58,16 @@ jobs:
                   const titleFormatted = baseName.replace(/\./g, ' ');
 
                   const cleanBase = clean(baseName);
-                  const cleanCat = clean(category);
+                  const cleanRaw = clean(rawTitle);
 
-                  // Busca flexível de capa:
+                  // Busca flexível de capa
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = clean(path.basename(file, path.extname(file)));
                     if (!cBase) return false;
                     return cleanBase.includes(cBase) || 
                            cBase.includes(cleanBase) || 
-                           cleanCat.includes(cBase) || 
-                           cBase.includes(cleanCat);
+                           cleanRaw.includes(cBase) || 
+                           cBase.includes(cleanRaw);
                   });
 
                   let logoAttr = '';
@@ -73,8 +77,11 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${category}",${titleFormatted}\n`;
-                  m3uContent += `${asset.browser_download_url}\n\n`;
+                  // Cria uma entrada na lista para cada categoria informada
+                  for (const cat of categories) {
+                    m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${cat}",${titleFormatted}\n`;
+                    m3uContent += `${asset.browser_download_url}\n\n`;
+                  }
                 }
               }
             }
@@ -85,5 +92,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: lista.m3u atualizada com busca flexivel de capas"
+          commit_message: "Auto: lista.m3u atualizada com suporte a multiplas categorias"
           file_pattern: 'lista.m3u'
