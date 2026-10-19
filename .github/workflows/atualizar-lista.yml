@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
 
-      - name: Gerar lista M3U com separacao de categorias
+      - name: Gerar lista M3U com suporte a categorias sem conflito
         uses: actions/github-script@v7
         with:
           script: |
@@ -64,7 +64,7 @@ jobs:
                   const cleanBase = clean(baseName);
                   const cleanRaw = clean(rawTitle);
 
-                  // Localização flexível da imagem de capa
+                  // Busca flexível de capa
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = clean(path.basename(file, path.extname(file)));
                     if (!cBase) return false;
@@ -81,11 +81,16 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  // Cria uma linha completa para cada categoria individual
-                  for (const cat of categories) {
+                  // Cria uma linha para cada categoria com parâmetro único para evitar deduplicação
+                  categories.forEach((cat, index) => {
+                    const separator = asset.browser_download_url.includes('?') ? '&' : '?';
+                    const streamUrl = categories.length > 1 
+                      ? `${asset.browser_download_url}${separator}cat=${index + 1}`
+                      : asset.browser_download_url;
+
                     m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${cat}",${titleFormatted}\n`;
-                    m3uContent += `${asset.browser_download_url}\n\n`;
-                  }
+                    m3uContent += `${streamUrl}\n\n`;
+                  });
                 }
               }
             }
@@ -96,5 +101,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: categorias separadas individualmente na lista"
+          commit_message: "Auto: URLs unicas por categoria para evitar deduplicacao no ClouDDy"
           file_pattern: 'lista.m3u'
