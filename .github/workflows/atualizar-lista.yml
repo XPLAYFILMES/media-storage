@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
 
-      - name: Gerar lista M3U com titulos separados por categoria
+      - name: Gerar lista M3U com titulos limpos e invisiveis
         uses: actions/github-script@v7
         with:
           script: |
@@ -63,7 +63,6 @@ jobs:
                   const cleanBase = clean(baseName);
                   const cleanRaw = clean(rawTitle);
 
-                  // Localização flexível de capa
                   const matchedCapa = capaFiles.find(file => {
                     const cBase = clean(path.basename(file, path.extname(file)));
                     if (!cBase) return false;
@@ -80,20 +79,21 @@ jobs:
                     logoAttr = `tvg-logo="${logoUrl}" `;
                   }
 
-                  // Cria entrada com identificador e nome unico por categoria
                   categories.forEach((cat, index) => {
                     const separator = asset.browser_download_url.includes('?') ? '&' : '?';
                     const streamUrl = categories.length > 1 
                       ? `${asset.browser_download_url}${separator}cat=${index + 1}`
                       : asset.browser_download_url;
 
-                    // Se tiver mais de uma categoria, adiciona o rotulo no titulo para o ClouDDy nao descartar
-                    const cleanCatName = cat.replace(/^Filmes\s*-\s*/i, '').trim();
-                    const finalTitle = categories.length > 1 
-                      ? `${titleFormatted} (${cleanCatName})`
-                      : titleFormatted;
+                    // Adiciona caracteres invisiveis (Zero-Width Space) de acordo com o indice da categoria
+                    // Isso torna os titulos diferentes para o banco de dados do app, mas identicos visualmente na TV
+                    const invisiblePadding = '\u200B'.repeat(index);
+                    const finalTitle = `${titleFormatted}${invisiblePadding}`;
 
-                    m3uContent += `#EXTINF:-1 ${logoAttr}group-title="${cat}",${finalTitle}\n`;
+                    // tvg-name carrega a diferenca técnica interna oculta
+                    const internalName = `${titleFormatted} [${cat}]`;
+
+                    m3uContent += `#EXTINF:-1 tvg-name="${internalName}" ${logoAttr}group-title="${cat}",${finalTitle}\n`;
                     m3uContent += `${streamUrl}\n\n`;
                   });
                 }
@@ -106,5 +106,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "Auto: titulos distintos para suportar multiplas categorias no ClouDDy"
+          commit_message: "Auto: titulos limpos com caracteres invisiveis para multiplas categorias"
           file_pattern: 'lista.m3u'
