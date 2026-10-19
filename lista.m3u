@@ -3,6 +3,9 @@
 #EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",Sam Sapeca S01E01
 https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/Sam.Sapeca.S01E01.mp4
 
+#EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Sam%20Sapeca.jpg" group-title="Series-Sam Sapeca",videoplayback 2
+https://github.com/XPLAYFILMES/media-storage/releases/download/sam-sapeca-t1/videoplayback.2.mp4
+
 #EXTINF:-1 tvg-logo="https://cdn.jsdelivr.net/gh/XPLAYFILMES/media-storage@main/capas/Series-Digimon.jpg" group-title="Series-Digimon",Digimon S01E11
 https://github.com/XPLAYFILMES/media-storage/releases/download/digimon-t1/Digimon.S01E11.mp4
 
